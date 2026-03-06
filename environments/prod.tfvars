@@ -52,8 +52,8 @@ enable_cloudtrail = true
 
 # CI/CD
 enable_cicd         = true
-github_org          = ""  # Your GitHub org/username
-github_repositories = []  # ["backend-api", "frontend-app"]
+github_org          = "https://github.com/LuiFerCM/jfc-ecommerce-infra.git"  # Your GitHub org/username
+github_repositories = ["jfc-ecommerce-infra"]  # ["backend-api", "frontend-app"]
 
 # Budget
 monthly_budget_amount = 600

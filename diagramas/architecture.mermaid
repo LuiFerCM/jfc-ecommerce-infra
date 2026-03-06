@@ -1,0 +1,104 @@
+graph TB
+    subgraph "Internet"
+        Users((Users))
+        GitHub[GitHub Actions<br/>CI/CD]
+    end
+
+    subgraph "AWS Cloud"
+        subgraph "Edge Layer"
+            CF[CloudFront CDN<br/>Frontend SPA]
+            WAF[AWS WAF<br/>OWASP + Rate Limit]
+            R53[Route 53<br/>DNS]
+        end
+
+        subgraph "VPC 10.0.0.0/16"
+            subgraph "Public Subnets (AZ-a & AZ-b)"
+                ALB[Application Load<br/>Balancer]
+                NAT[NAT Gateway]
+                Bastion[Bastion Host<br/>t3.micro + SSM]
+            end
+
+            subgraph "App Subnets - Private (AZ-a & AZ-b)"
+                ECS1[ECS Fargate<br/>Task 1]
+                ECS2[ECS Fargate<br/>Task 2]
+                ECSN[ECS Fargate<br/>Task N - AutoScaling]
+            end
+
+            subgraph "Data Subnets - Isolated (AZ-a & AZ-b)"
+                Aurora[(Aurora Serverless v2<br/>PostgreSQL)]
+                Redis[(ElastiCache<br/>Redis 7.1)]
+            end
+
+            subgraph "VPC Endpoints"
+                VPCE[S3 · ECR · Logs<br/>Secrets Manager]
+            end
+        end
+
+        subgraph "Storage"
+            S3F[S3 Frontend<br/>Static Assets]
+            S3L[S3 Logs<br/>Centralized]
+        end
+
+        subgraph "Security"
+            KMS[KMS<br/>Encryption]
+            SM[Secrets Manager<br/>DB Credentials]
+            CT[CloudTrail<br/>Audit Logs]
+            OIDC[IAM OIDC<br/>GitHub Provider]
+        end
+
+        subgraph "Observability"
+            CW[CloudWatch<br/>Metrics & Alarms]
+            DASH[CloudWatch<br/>Dashboard]
+            SNS[SNS<br/>Notifications]
+            CI[Container<br/>Insights]
+        end
+
+        subgraph "Container Registry"
+            ECR[Amazon ECR<br/>Docker Images]
+        end
+
+        subgraph "Cost Management"
+            Budget[AWS Budgets<br/>Alerts at 50/80/100/150%]
+        end
+    end
+
+    Users -->|HTTPS| R53
+    R53 -->|Frontend| CF
+    R53 -->|API| ALB
+    CF --> S3F
+    Users -->|API Requests| WAF
+    WAF --> ALB
+    ALB --> ECS1
+    ALB --> ECS2
+    ALB --> ECSN
+    ECS1 --> Aurora
+    ECS1 --> Redis
+    ECS2 --> Aurora
+    ECS2 --> Redis
+    ECS1 -.->|VPC Endpoint| VPCE
+    ECS1 -->|Logs| CW
+    GitHub -->|OIDC| OIDC
+    GitHub -->|Push Image| ECR
+    GitHub -->|Deploy| ECS1
+    SM -.->|Inject Secrets| ECS1
+    KMS -.->|Encrypt| Aurora
+    KMS -.->|Encrypt| Redis
+    KMS -.->|Encrypt| S3L
+    CW --> SNS
+    CI --> CW
+    ALB -->|Access Logs| S3L
+    CT -->|Trail Logs| S3L
+
+    classDef aws fill:#FF9900,stroke:#232F3E,color:white
+    classDef security fill:#DD344C,stroke:#232F3E,color:white
+    classDef compute fill:#ED7100,stroke:#232F3E,color:white
+    classDef data fill:#3B48CC,stroke:#232F3E,color:white
+    classDef network fill:#8C4FFF,stroke:#232F3E,color:white
+    classDef monitoring fill:#E7157B,stroke:#232F3E,color:white
+
+    class CF,S3F,S3L aws
+    class WAF,KMS,SM,CT,OIDC security
+    class ECS1,ECS2,ECSN,ECR compute
+    class Aurora,Redis data
+    class ALB,NAT,R53,Bastion,VPCE network
+    class CW,DASH,SNS,CI,Budget monitoring

@@ -258,9 +258,9 @@ Ver [docs/COST_ESTIMATION.md](docs/COST_ESTIMATION.md) para el desglose completo
 4. **Eficiencia de Rendimiento**: Fargate (right-sizing), Redis caching, CloudFront CDN, Aurora Serverless v2
 5. **Optimización de Costos**: Pay-per-use (Serverless v2 + Fargate), NAT único, S3 lifecycle, Budgets
 
-### Mejoras sobre arquitectura de referencia
+### Mejoras sobre arquitectura
 
-| Aspecto | Referencia (CesarLeiva) | Esta Solución |
+| Aspecto | Referencia | Esta Solución |
 |---------|------------------------|---------------|
 | Database | RDS PostgreSQL (instancia fija) | **Aurora Serverless v2** (auto-scaling) |
 | NAT Costs | NAT Gateway por AZ | **NAT único** + VPC Endpoints |

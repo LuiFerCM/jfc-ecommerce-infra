@@ -103,7 +103,7 @@
 ## Link a AWS Pricing Calculator
 
 Para generar tu propia estimación personalizada:
-https://calculator.aws/
+https://calculator.aws/#/estimate?id=273e8e9cc5267f8cd6d9ecb3fe6b27ba513d17f9
 
 Servicios a incluir: ECS Fargate, Aurora Serverless v2, ElastiCache,
 ALB, NAT Gateway, CloudFront, S3, WAF, CloudWatch, Secrets Manager, KMS
